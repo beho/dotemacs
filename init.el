@@ -171,9 +171,9 @@
 ;; TODO use smartparen and disable elec-pair and paredit
 ;; https://ebzzry.com/en/emacs-pairs/
 ;; https://github.com/Fuco1/smartparens
-(use-package elec-pair
-  :config
-  (electric-pair-mode +1))
+;; (use-package elec-pair
+;;   :config
+;;   (electric-pair-mode +1))
 
 (use-package uniquify
   :config
@@ -325,9 +325,58 @@
 (use-package rainbow-delimiters
   :ensure t)
 
-(use-package paredit
+;; (use-package paredit
+;;   :ensure t
+;;   :diminish 'paredit-mode)
+
+(use-package smartparens
   :ensure t
-  :diminish 'paredit-mode)
+  :bind (:map smartparens-mode-map
+              ("C-M-a" . sp-beginning-of-sexp)
+              ("C-M-e" . sp-end-of-sexp)
+
+              ("C-<down>" . sp-down-sexp)
+              ("C-<up>"   . sp-up-sexp)
+              ("M-<down>" . sp-backward-down-sexp)
+              ("M-<up>"   . sp-backward-up-sexp)
+
+              ("C-M-f" . sp-forward-sexp)
+              ("C-M-b" . sp-backward-sexp)
+
+              ("C-M-n" . sp-next-sexp)
+              ("C-M-p" . sp-previous-sexp)
+
+              ("C-S-f" . sp-forward-symbol)
+              ("C-S-b" . sp-backward-symbol)
+
+              ("C-<right>" . sp-forward-slurp-sexp)
+              ("M-<right>" . sp-forward-barf-sexp)
+              ("C-<left>"  . sp-backward-slurp-sexp)
+              ("M-<left>"  . sp-backward-barf-sexp)
+
+              ("C-M-t" . sp-transpose-sexp)
+              ("C-M-k" . sp-kill-sexp)
+              ("C-k"   . sp-kill-hybrid-sexp)
+              ("M-k"   . sp-backward-kill-sexp)
+              ("C-M-w" . sp-copy-sexp)
+              ("C-M-d" . delete-sexp)
+
+              ("M-<backspace>" . backward-kill-word)
+              ("C-<backspace>" . sp-backward-kill-word)
+              ([remap sp-backward-kill-word] . backward-kill-word)
+
+              ("M-[" . sp-backward-unwrap-sexp)
+              ("M-]" . sp-unwrap-sexp)
+
+              ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+              ("C-c ("  . wrap-with-parens)
+              ("C-c ["  . wrap-with-brackets)
+              ("C-c {"  . wrap-with-braces)
+              ("C-c '"  . wrap-with-single-quotes)
+              ("C-c \"" . wrap-with-double-quotes)
+              ("C-c _"  . wrap-with-underscores)
+              ("C-c `"  . wrap-with-back-quotes)))
 
 (use-package expand-region
   :ensure t
@@ -512,7 +561,8 @@
   ; config rainbow-delimiters, paredit
   :ensure t
   :config
-  (add-hook 'clojure-mode-hook #'paredit-mode)
+                                        ;  (add-hook 'clojure-mode-hook #'paredit-mode)
+  (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
   ; (add-hook 'clojure-mode-hook #'subword-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
 
@@ -533,7 +583,7 @@
   :init
   (setq inferior-lisp-program "sbcl")
   :config
-  (add-hook 'clojure-mode-hook #'paredit-mode)
+  (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
   ; (add-hook 'clojure-mode-hook #'subword-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
 
@@ -597,9 +647,9 @@
  '(custom-safe-themes
    '("37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" "ea0e92e8625b7681a490123b40e45a6b7d88febcc4cd456c2f9ad27a9637eb2e" default))
  '(package-selected-packages
-   '(bm smooth-scrolling-mode smooth-scrolling dockerfile-mode lsp-treemacs treemacs-icons-dired treemacs-projectile treemacs lsp-ui oceanic-theme inf-ruby slime exec-path-from-shell nim-mode ripgrep smart-tab ace-window diminish nord-theme subatomic-theme atom-one-dark-theme magit flycheck-pony ponylang-mode which-key selectrum-prescient selectrum-prscient selectrum inf-clojure clojure-inf flycheck lsp-mode paredit move-text rainbow-delimiters company projectile cider use-package))
+   '(smartparens bm smooth-scrolling-mode smooth-scrolling dockerfile-mode lsp-treemacs treemacs-icons-dired treemacs-projectile treemacs lsp-ui oceanic-theme inf-ruby slime exec-path-from-shell nim-mode ripgrep smart-tab ace-window diminish nord-theme subatomic-theme atom-one-dark-theme magit flycheck-pony ponylang-mode which-key selectrum-prescient selectrum-prscient selectrum inf-clojure clojure-inf flycheck lsp-mode paredit move-text rainbow-delimiters company projectile cider use-package))
  '(subatomic-more-visible-comment-delimiters t)
- '(warning-suppress-types '()))
+ '(warning-suppress-types 'nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
