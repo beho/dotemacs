@@ -1,3 +1,24 @@
+;;; setup straight
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+      (bootstrap-version 5))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
+(setq shell-file-name "/bin/bash")
+;; (setenv "SHELL" "/bin/bash")
+
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t
+      use-package-always-ensure t)
+
 ;;; mac keyboard mappings
 (setq mac-option-modifier 'meta)
 (setq mac-command-modifier 'hyper)
@@ -5,17 +26,37 @@
 ;;; tabs
 ; TODO styling
 (global-tab-line-mode -1)
-(menu-bar-mode -1)
+;; (menu-bar-mode 1)
 
 (scroll-bar-mode -1)
 
+(load-theme 'beho-light t)
+
+;; (setq mode-line-position-column-line-format '(" %l / %c"))
+;; mode-line-position
+(setq mode-line-format
+      '(; buffer status
+        " %* "
+        ; buffer name
+        mode-line-buffer-identification
+        ; cursor
+        "L%l / %c"
+        "     "
+        mode-name
+        minor-mode-alist ; TODO
+        (vc-mode vc-mode)))
+
+        ;; "%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified " " mode-line-buffer-identification " " mode-line-position (vc-mode vc-mode)))
+;; ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   " mode-line-position (vc-mode vc-mode) "  " ...)
+
+
 ;;; font
 (set-face-attribute 'default nil
-		    :family "Victor Mono" :height 120 :weight 'semibold)
-(set-face-attribute 'mode-line nil
-                    :family "Victor Mono" :height 120 :weight 'normal)
-(set-face-attribute 'mode-line-inactive nil
-                    :family "Victor Mono" :height 120 :weight 'normal)
+		    :family "Victor Mono" :height 120 :weight 'normal)
+;; (set-face-attribute 'mode-line nil
+;;                     :family "Victor Mono" :height 120 :weight 'normal)
+;; (set-face-attribute 'mode-line-inactive nil
+;;                     :family "Victor Mono" :height 120 :weight 'normal)
 (set-face-attribute 'line-number-current-line nil
                     :foreground "white smoke")
 
@@ -30,16 +71,16 @@
 ;;; package management
 (require 'package)
 
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+;; (add-to-list 'package-archives
+;;              '("melpa" . "https://melpa.org/packages/") t)
 
 ;; keep the installed packages in .emacs.d
-(setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
+;; (setq package-user-dir (expand-file-name "elpa" user-emacs-directory))
 
-(package-initialize)
+;; (package-initialize)
 ;; update the package metadata is the local cache is missing
-(unless package-archive-contents
-  (package-refresh-contents))
+;; (unless package-archive-contents
+;;   (package-refresh-contents))
 
 (setq user-full-name "Svatopluk Šperka"
       user-mail-address "sperka@gmail.com")
@@ -81,7 +122,11 @@
 ;; disable startup screen
 (setq inhibit-startup-screen t)
 
+;; https://emacs.stackexchange.com/a/28746
+(setq auto-window-vscroll nil)
+
 (global-display-line-numbers-mode)
+(global-hl-line-mode)
 
 ;; mode line settings
 (line-number-mode t)
@@ -106,7 +151,7 @@
 (setq-default tab-width 8)            ;; but maintain correct appearance
 
 ;; smart tab behavior - indent or complete
-(setq tab-always-indent 'complete)
+;; (setq tab-always-indent t)
 
 ;; Wrap lines at 120 characters
 (setq-default fill-column 120)
@@ -134,23 +179,21 @@
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
-(require 'use-package)
+;; (require 'use-package)
 (setq use-package-verbose t)
 
 ; package for syncing Emacs with shell
-(use-package exec-path-from-shell
-  :ensure t)
+(use-package exec-path-from-shell)
 
 ; sync PATH, exec-path
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
-(use-package smooth-scrolling
-  :ensure t
-  :config
-  (setq smooth-scroll-margin 5)
-  :init
-  (smooth-scrolling-mode 1))
+;; (use-package smooth-scrolling
+;;   :config
+;;   (setq smooth-scroll-margin 5)
+;;   :init
+;;   (smooth-scrolling-mode 1))
 
 ;; (setq scroll-step 10
 ;;       scroll-conservatively 1)
@@ -159,9 +202,9 @@
 
 ;; load diminish first so that we can use it further
 (use-package diminish
-  :ensure t)
+  :diminish 'auto-revert-mode)
 
-(require 'diminish)
+;(require 'diminish)
 
 ;;; built-in packages
 (use-package paren
@@ -175,14 +218,13 @@
 ;;   :config
 ;;   (electric-pair-mode +1))
 
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-separator "/")
-  ;; rename after killing uniquified
-  (setq uniquify-after-kill-buffer-p t)
-  ;; don't muck with special buffers
-  (setq uniquify-ignore-buffers-re "^\\*"))
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'forward
+      uniquify-separator "/"
+      ;; rename after killing uniquified
+      uniquify-after-kill-buffer-p t
+      ;; don't muck with special buffers
+      uniquify-ignore-buffers-re "^\\*")
 
 ;; saveplace remembers your location in a file when saving files
 (use-package saveplace
@@ -204,7 +246,6 @@
 
 ;; bookmarks
 (use-package bm
-  :ensure t
   :demand t
 
   :init
@@ -264,24 +305,20 @@
 
 ;;; third-party packages
 
-(use-package smart-tab
-  :ensure t)
+(use-package smart-tab)
 
-(use-package magit
-  :ensure t)
+(use-package magit)
 
-(use-package ripgrep
-  :ensure t)
+(use-package ripgrep)
 
 ;; (use-package nord-theme
 ;;   :ensure t
 ;;   :config
 ;;   (load-theme 'nord t))
 
-(use-package oceanic-theme
-  :ensure t
-  :config
-  (load-theme 'oceanic t))
+;; (use-package oceanic-theme
+;;   :config
+;;   (load-theme 'oceanic t))
 
 (set-face-italic 'font-lock-comment-face nil)
 
@@ -301,36 +338,37 @@
 ;;   (load-theme 'zenburn t))
 
 (use-package selectrum
-  :ensure t
   :config
   (selectrum-mode 1))
 
 (use-package selectrum-prescient
-  :ensure t
   :config
   (selectrum-prescient-mode 1))
 
 (use-package which-key
-  :ensure t
   :diminish 'which-key-mode
   :config
   (which-key-mode))
 
 (use-package move-text
-  :ensure t
   :bind
   (([(meta shift up)] . move-text-up)
    ([(meta shift down)] . move-text-down)))
 
-(use-package rainbow-delimiters
-  :ensure t)
+;; (use-package rainbow-delimiters)
 
 ;; (use-package paredit
 ;;   :ensure t
 ;;   :diminish 'paredit-mode)
 
+;; (use-package parinfer-rust-mode
+;;   :init
+;;   (setq parinfer-rust-auto-download t))
+
 (use-package smartparens
-  :ensure t
+  :config
+  ;; (sp-pair "'" nil :actions :rem)
+  (sp-pair "`" nil :actions :rem)
   :bind (:map smartparens-mode-map
               ("C-M-a" . sp-beginning-of-sexp)
               ("C-M-e" . sp-end-of-sexp)
@@ -350,40 +388,43 @@
               ("C-S-b" . sp-backward-symbol)
 
               ("C-<right>" . sp-forward-slurp-sexp)
-              ("M-<right>" . sp-forward-barf-sexp)
-              ("C-<left>"  . sp-backward-slurp-sexp)
-              ("M-<left>"  . sp-backward-barf-sexp)
+              ("C-<left>" . sp-forward-barf-sexp)
+              ("M-<left>"  . sp-backward-slurp-sexp)
+              ("M-<right>"  . sp-backward-barf-sexp)
 
-              ("C-M-t" . sp-transpose-sexp)
+              ;; ("C-M-t" . sp-transpose-sexp)
               ("C-M-k" . sp-kill-sexp)
               ("C-k"   . sp-kill-hybrid-sexp)
               ("M-k"   . sp-backward-kill-sexp)
               ("C-M-w" . sp-copy-sexp)
-              ("C-M-d" . delete-sexp)
-
+              
               ("M-<backspace>" . backward-kill-word)
               ("C-<backspace>" . sp-backward-kill-word)
               ([remap sp-backward-kill-word] . backward-kill-word)
 
-              ("M-[" . sp-backward-unwrap-sexp)
-              ("M-]" . sp-unwrap-sexp)
+              ;; ("M-[" . sp-backward-unwrap-sexp)
+              ("M-s" . sp-unwrap-sexp)
 
-              ("C-x C-t" . sp-transpose-hybrid-sexp)
+              ;; ("C-x C-t" . sp-transpose-hybrid-sexp)
 
-              ("C-c ("  . wrap-with-parens)
-              ("C-c ["  . wrap-with-brackets)
-              ("C-c {"  . wrap-with-braces)
-              ("C-c '"  . wrap-with-single-quotes)
-              ("C-c \"" . wrap-with-double-quotes)
-              ("C-c _"  . wrap-with-underscores)
-              ("C-c `"  . wrap-with-back-quotes)))
+              ("C-c ("  . sp-wrap-round)
+              ("C-c ["  . sp-wrap-square)
+              ("C-c {"  . sp-wrap-curly)
+              ;; ("C-c '"  . wrap-with-single-quotes)
+              ;; ("C-c \"" . wrap-with-double-quotes)
+              ;; ("C-c _"  . wrap-with-underscores)
+              ;; ("C-c `"  . wrap-with-back-quotes)
+              ))
 
 (use-package expand-region
-  :ensure t
   :bind ("C-=" . er/expand-region))
 
+; required by lsp + company to offer snippets
+(use-package yasnippet
+  :config
+  (yas-global-mode))
+
 (use-package company
-  :ensure t
   :diminish 'company-mode
   :config
   (setq company-idle-delay 0.1)
@@ -394,32 +435,30 @@
   ;; invert the navigation direction if the the completion popup-isearch-match
   ;; is displayed on top (happens near the bottom of windows)
   (setq company-tooltip-flip-when-above t)
-;  (global-set-key (kbd "<M-tab>") 'company-complete) ; using smart-tab instead
+;  (global-set-key (kbd "<tab>") 'company-complete-selection) ; using smart-tab instead
+  (setq company-backends '((company-capf :with company-yasnippet)))
   (global-company-mode)
   ;; (diminish 'company-mode)
-  )
+  :bind (:map company-active-map ("<tab>" . company-complete-selection)))
 
 (use-package flycheck
-  :ensure t
   :config
   (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package projectile
-  :ensure t
-  :diminish ('projectile-mode . "p")
+  :diminish 'projectile-mode ;('projectile-mode . "P")
+;  :diminish ('projectile-mode . "PPP")
   :config
   (global-set-key (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
 
 (use-package ace-window
-  :ensure t
   :config
   (global-set-key (kbd "M-o") 'ace-window)
   (setq aw-dispatch-always t))
 
 ;; treemacs
 (use-package treemacs
-  :ensure t
   :defer t
   :init
   ;; (with-eval-after-load 'winum
@@ -502,12 +541,10 @@
         ("C-x t M-t" . treemacs-find-tag)))
 
 (use-package treemacs-projectile
-  :after (treemacs projectile)
-  :ensure t)
+  :after (treemacs projectile))
 
 (use-package treemacs-icons-dired
-  :hook (dired-mode . treemacs-icons-dired-enable-once)
-  :ensure t)
+  :hook (dired-mode . treemacs-icons-dired-enable-once))
 
 ;; (use-package treemacs-magit
 ;;   :after (treemacs magit)
@@ -519,78 +556,49 @@
 ;;   :config (treemacs-set-scope-type 'Perspectives))
 ;; END treemacs
 
-(use-package lsp-mode
-  :ensure t
-  :init
-  (setq lsp-keymap-prefix "M-l"
-        ; disable lsp autocomplete - use cider
-        ;; works now
-        ;lsp-completion-enable nil
-        )
-  :hook ((clojure-mode . lsp)
-         (clojurec-mode . lsp)
-         (clojurescript-mode . lsp)
-         (zig-mode . lsp)
-         (lsp-mode . lsp-enable-which-key-integration)
-         (ruby-mode . lsp))
-  :config
-  ;; add paths to your local installation of project mgmt tools, like lein
-  ;; (setenv "PATH" (concat
-  ;;                  "/usr/local/bin" path-separator
-  ;;                  (getenv "path")))
-  (dolist (m '(clojure-mode
-               clojurec-mode
-               clojurescript-mode
-               clojurex-mode))
-    (add-to-list 'lsp-language-id-configuration `(,m . "clojure"))))
 
-(use-package lsp-ui
-  :ensure t
-  :config
-  (setq lsp-lens-enable nil
-        lsp-ui-sideline-show-code-actions nil
-        lsp-ui-doc-enable nil
-        lsp-ui-peek-enable nil))
-
-(use-package lsp-treemacs
-  :ensure t)
 
 ;; Clojure
 
 (use-package clojure-mode
   ; config rainbow-delimiters, paredit
-  :ensure t
   :config
                                         ;  (add-hook 'clojure-mode-hook #'paredit-mode)
   (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
   ; (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+  )
 
-(use-package inf-clojure
-    ; config rainbow-delimiters, paredit
-  :ensure t)
+;; (use-package inf-clojure) ; config rainbow-delimiters, paredit
 
 (use-package cider
-    ; config rainbow-delimiters, paredit
-  :ensure t)
-
+  :config
+  (setq cider-show-error-buffer t ;'only-in-repl
+        cider-font-lock-dynamically nil ; use lsp semantic tokens
+        cider-eldoc-display-for-symbol-at-point nil ; use lsp
+        cider-prompt-for-symbol nil
+        cider-use-xref nil) ; use lsp
+  ;; use lsp completion
+  (add-hook 'cider-mode-hook (lambda () (remove-hook 'completion-at-point-functions #'cider-complete-at-point))
+;  (remove-hook 'completion-at-point-functions #'cider-complete-at-point t)
+ ; (add-hook 'completion-at-point-functions #'cider-complete-at-point 0 t)
+  ))       ; config rainbow-delimiters, paredit
+                                 
 (defun disable-whitespace-mode ()
   (whitespace-mode -1))
 
 ;; Common Lisp
-(use-package slime
-  :ensure t
-  :init
-  (setq inferior-lisp-program "sbcl")
-  :config
-  (add-hook 'clojure-mode-hook #'smartparens-strict-mode)
-  ; (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+;; (use-package slime
+;;   :init
+;;   (setq inferior-lisp-program "sbcl")
+;;   :config
+;;   (add-hook 'slime-mode-hook #'smartparens-strict-mode))
+
+;; neo4j cypher
+;; (use-package cypher-mode)
 
 ;; Zig
 
-(use-package zig-mode
-  :ensure t)
+(use-package zig-mode)
 
 ;; Pony
 
@@ -623,7 +631,6 @@
 ;; Ruby
 
 (use-package inf-ruby
-  :ensure t
   :config
   (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode))
 
@@ -634,10 +641,44 @@
 
 ;; Dockerfile
 
-(use-package dockerfile-mode
-  :ensure t)
+(use-package dockerfile-mode)
+
+(use-package lsp-mode
+  :init
+  (setq lsp-keymap-prefix "M-l"
+        ; disable lsp autocomplete - use cider
+        ;; works now
+        ;lsp-completion-enable nil
+        )
+  :hook ((clojure-mode . lsp)
+         (clojurec-mode . lsp)
+         (clojurescript-mode . lsp)
+         (zig-mode . lsp)
+         (lsp-mode . lsp-enable-which-key-integration)
+         (ruby-mode . lsp))
+  :config
+  ;; add paths to your local installation of project mgmt tools, like lein
+  ;; (setenv "PATH" (concat
+  ;;                  "/usr/local/bin" path-separator
+  ;;                  (getenv "path")))
+  ;; (dolist (m '(clojure-mode
+  ;;              clojurec-mode
+  ;;              clojurescript-mode
+  ;;              clojurex-mode))
+  ;;   (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
+  )
+
+(use-package lsp-ui
+  :config
+  (setq lsp-lens-enable nil
+        lsp-ui-sideline-show-code-actions nil
+        lsp-ui-doc-enable nil
+        lsp-ui-peek-enable nil))
+
+(use-package lsp-treemacs)
 
 (diminish 'eldoc-mode)
+(diminish 'flycheck-mode)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -645,10 +686,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(custom-safe-themes
-   '("37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" "ea0e92e8625b7681a490123b40e45a6b7d88febcc4cd456c2f9ad27a9637eb2e" default))
+   '("a26c7fb9347b6b66fdad6cfe88fadeec395ddfb2ef13f80531c4e2f9cd083361" "f80e2e454abd167243b8bbbefa92d9e8a46813769ba0c49af8ff4582b943b8b4" "ee9f1c32046a8db565e21cd66b84e2ac6440ca3d633eea74194451ec57a8c846" "5c9bd73de767fa0d0ea71ee2f3ca6fe77261d931c3d4f7cca0734e2a3282f439" "37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" "ea0e92e8625b7681a490123b40e45a6b7d88febcc4cd456c2f9ad27a9637eb2e" default))
  '(package-selected-packages
-   '(smartparens bm smooth-scrolling-mode smooth-scrolling dockerfile-mode lsp-treemacs treemacs-icons-dired treemacs-projectile treemacs lsp-ui oceanic-theme inf-ruby slime exec-path-from-shell nim-mode ripgrep smart-tab ace-window diminish nord-theme subatomic-theme atom-one-dark-theme magit flycheck-pony ponylang-mode which-key selectrum-prescient selectrum-prscient selectrum inf-clojure clojure-inf flycheck lsp-mode paredit move-text rainbow-delimiters company projectile cider use-package))
+   '())
  '(subatomic-more-visible-comment-delimiters t)
+ '(warning-suppress-log-types '((comp)))
  '(warning-suppress-types 'nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -657,3 +699,4 @@
  ;; If there is more than one, they won't work right.
  '(italic ((t (:slant normal)))))
 
+;; '(smartparens bm smooth-scrolling-mode smooth-scrolling dockerfile-mode lsp-treemacs treemacs-icons-dired treemacs-projectile treemacs lsp-ui oceanic-theme inf-ruby slime exec-path-from-shell nim-mode ripgrep smart-tab ace-window diminish nord-theme subatomic-theme atom-one-dark-theme magit flycheck-pony ponylang-mode which-key selectrum-prescient selectrum-prscient selectrum inf-clojure clojure-inf flycheck lsp-mode paredit move-text rainbow-delimiters company projectile cider use-package)
