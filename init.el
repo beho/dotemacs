@@ -242,7 +242,8 @@
         savehist-autosave-interval 60
         ;; keep the home clean
         savehist-file (expand-file-name "savehist" beho-savefile-dir))
-  (savehist-mode +1))
+  :init
+  (savehist-mode))
 
 ;; bookmarks
 (use-package bm
@@ -337,13 +338,27 @@
 ;;   :config
 ;;   (load-theme 'zenburn t))
 
-(use-package selectrum
-  :config
-  (selectrum-mode 1))
+;; (use-package selectrum
+;;   :config
+;;   (selectrum-mode 1))
 
-(use-package selectrum-prescient
-  :config
-  (selectrum-prescient-mode 1))
+;; (use-package selectrum-prescient
+;;   :config
+;;   (selectrum-prescient-mode 1))
+
+(use-package vertico
+  :straight (:files (:defaults "extensions/*"))
+  :init
+  (vertico-mode))
+
+(use-package orderless
+  :init
+  ;; Configure a custom style dispatcher (see the Consult wiki)
+  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
+  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package which-key
   :diminish 'which-key-mode
@@ -424,22 +439,88 @@
   :config
   (yas-global-mode))
 
-(use-package company
-  :diminish 'company-mode
-  :config
-  (setq company-idle-delay 0.1)
-  (setq company-show-quick-access t)
-  (setq company-tooltip-limit 10)
-  (setq company-minimum-prefix-length 2)
-  (setq company-tooltip-align-annotations t)
-  ;; invert the navigation direction if the the completion popup-isearch-match
-  ;; is displayed on top (happens near the bottom of windows)
-  (setq company-tooltip-flip-when-above t)
-;  (global-set-key (kbd "<tab>") 'company-complete-selection) ; using smart-tab instead
-  (setq company-backends '((company-capf :with company-yasnippet)))
-  (global-company-mode)
-  ;; (diminish 'company-mode)
-  :bind (:map company-active-map ("<tab>" . company-complete-selection)))
+;; (use-package company
+;;   :diminish 'company-mode
+;;   :config
+;;   (setq company-idle-delay 0.1)
+;;   (setq company-show-quick-access t)
+;;   (setq company-tooltip-limit 10)
+;;   (setq company-minimum-prefix-length 2)
+;;   (setq company-tooltip-align-annotations t)
+;;   ;; invert the navigation direction if the the completion popup-isearch-match
+;;   ;; is displayed on top (happens near the bottom of windows)
+;;   (setq company-tooltip-flip-when-above t)
+;; ;  (global-set-key (kbd "<tab>") 'company-complete-selection) ; using smart-tab instead
+;;   (setq company-backends '((company-capf :with company-yasnippet)))
+;;   (global-company-mode)
+;;   ;; (diminish 'company-mode)
+;;   :bind (:map company-active-map ("<tab>" . company-complete-selection)))
+
+(use-package corfu
+  :straight (:files (:defaults "extensions/*"))
+  ;; :load-path "straight/build/corfu/extensions/"
+  ;; Optional customizations
+  ;; :custom
+  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+  ;; (corfu-auto t)                 ;; Enable auto completion
+  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+
+  ;; Enable Corfu only for certain modes.
+  ;; :hook ((prog-mode . corfu-mode)
+  ;;        (shell-mode . corfu-mode)
+  ;;        (eshell-mode . corfu-mode))
+
+  ;; Recommended: Enable Corfu globally.
+  ;; This is recommended since Dabbrev can be used globally (M-/).
+  ;; See also `corfu-excluded-modes'.
+  :init
+  (global-corfu-mode)
+  
+  (require 'corfu-echo)
+  (setq corfu-echo-delay t)
+  (corfu-echo-mode)
+  
+  (require 'corfu-popupinfo)
+  (setq corfu-popupinfo-delay '(1.5 . 0))
+  (corfu-popupinfo-mode)
+
+  (require 'corfu-indexed))
+
+
+;; a few more useful configurations...
+(use-package emacs
+  :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
+
+  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete))
+
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  ;; Either bind `marginalia-cycle' globally or only in the minibuffer
+  :bind (("M-A" . marginalia-cycle)
+         :map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init configuration is always executed (Not lazy!)
+  :init
+
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
 
 (use-package flycheck
   :config
