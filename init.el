@@ -15,7 +15,7 @@
       user-mail-address "sperka@gmail.com")
 
 ;;disable Version Control
-(setq vc-handled-backends nil)
+;; (setq vc-handled-backends nil)
 
 ;; warn when opening files bigger than 100MB
 (setq large-file-warning-threshold 100000000)
@@ -75,12 +75,12 @@
  (concat
   ;; take the first installed font from this list, use at size 15
   (car (remove nil (mapcar (lambda (font) (car (member font (font-family-list))))
-                           '("Victor Mono" "Menlo"))))
+                           '("Berkeley Mono" "Victor Mono" "Menlo"))))
   "-12"))
 
 ;;; font
 ;; (set-face-attribute 'default nil
-;; 		    :family "Victor Mono" :height 120 :weight 'normal)
+;; 		    :family "Victor Mono" :height 140 :weight 'normal)
 ;; (set-face-attribute 'mode-line nil
 ;;                     :family "Victor Mono" :height 120 :weight 'normal)
 ;; (set-face-attribute 'mode-line-inactive nil
@@ -112,9 +112,10 @@
 ;; delete the selection with a keypress
 (delete-selection-mode t)
 
-;; (global-prettify-symbols-mode 1)
+;; (global-unset-key (kbd "C-w"))
+(global-set-key (kbd "C-`") 'backward-kill-word)
 
-(global-set-key (kbd "M-g f") 'avy-goto-line)
+;; (global-prettify-symbols-mode 1)
 
 ;; load modules
 (mapc #'load-file (directory-files (concat user-emacs-directory "modules") t "[0-9]*.el$"))
@@ -129,7 +130,6 @@
 
 (load-theme 'beho-light t)
 
-
 (use-package doom-themes
   :config
   (doom-themes-visual-bell-config))
@@ -140,6 +140,22 @@
         doom-themes-enable-italic t)
   :config
   (doom-modeline-mode t))
+
+
+;; navigate flymake errors
+(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
+
+;; navigate windows
+(global-set-key (kbd "M-s-<left>")  'windmove-left)
+(global-set-key (kbd "M-s-<right>") 'windmove-right)
+(global-set-key (kbd "M-s-<up>")    'windmove-up)
+(global-set-key (kbd "M-s-<down>")  'windmove-down)
+
+;; use calva's binding for eval
+(global-set-key (kbd "C-<return>") 'eval-last-sexp)
+(define-key cider-mode-map (kbd "C-<return>") 'cider-eval-last-sexp)
+;(define-key cider-mode-map (kbd "C-<return>") 'cider-eval-)
 
 
 ; parts stolen from https://github.com/bbatsov/emacs.d/blob/master/init.el
@@ -172,7 +188,7 @@
  '(custom-safe-themes
    '("a26c7fb9347b6b66fdad6cfe88fadeec395ddfb2ef13f80531c4e2f9cd083361" "f80e2e454abd167243b8bbbefa92d9e8a46813769ba0c49af8ff4582b943b8b4" "ee9f1c32046a8db565e21cd66b84e2ac6440ca3d633eea74194451ec57a8c846" "5c9bd73de767fa0d0ea71ee2f3ca6fe77261d931c3d4f7cca0734e2a3282f439" "37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" "ea0e92e8625b7681a490123b40e45a6b7d88febcc4cd456c2f9ad27a9637eb2e" default))
  '(package-selected-packages
-   '(paren-face vertico zig-mode which-key use-package treemacs-projectile treemacs-icons-dired subatomic-theme smooth-scrolling smartparens smart-tab slime selectrum-prescient ripgrep ponylang-mode paredit oceanic-theme nord-theme nim-mode move-text magit lsp-ui lsp-treemacs inf-ruby inf-clojure flycheck-pony expand-region exec-path-from-shell dockerfile-mode diminish cider bm atom-one-dark-theme))
+   '(corfu-echo markdown-mode json-reformat json-mode js2-mode zig-mode yasnippet which-key visual-regexp vertico use-package undo-fu treemacs smartparens smart-tab sideline-flymake projectile paren-face orderless move-text marginalia magit jarchive inf-ruby expand-region exec-path-from-shell eglot doom-themes doom-modeline dockerfile-mode corfu cider ag))
  '(subatomic-more-visible-comment-delimiters t)
  '(warning-suppress-log-types '((comp)))
  '(warning-suppress-types 'nil))
@@ -183,4 +199,3 @@
  ;; If there is more than one, they won't work right.
  '(italic ((t (:slant normal)))))
 
-;; '(smartparens bm smooth-scrolling-mode smooth-scrolling dockerfile-mode lsp-treemacs treemacs-icons-dired treemacs-projectile treemacs lsp-ui oceanic-theme inf-ruby slime exec-path-from-shell nim-mode ripgrep smart-tab ace-window diminish nord-theme subatomic-theme atom-one-dark-theme magit flycheck-pony ponylang-mode which-key selectrum-prescient selectrum-prscient selectrum inf-clojure clojure-inf flycheck lsp-mode paredit move-text rainbow-delimiters company projectile cider use-package)

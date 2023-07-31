@@ -94,6 +94,10 @@
 
 (use-package visual-regexp)
 
+(use-package avy
+  :config
+  (global-set-key (kbd "M-g f") 'avy-goto-line))
+
 ;; TODO fix extensions removing straight
 (use-package vertico
   ; :straight (:files (:defaults "extensions/*"))
@@ -107,7 +111,7 @@
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(orderless basic)
         completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-overrides '((file (styles . (partial-completion))))))
 
 ;; TODO fix extensions removing straight
 (use-package corfu
@@ -117,8 +121,8 @@
   :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+  (corfu-separator ?\s)          ;; Orderless field separator
+  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
   ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
@@ -135,16 +139,19 @@
   ;; See also `corfu-excluded-modes'.
   :init
   (global-corfu-mode)
-  
-  (require 'corfu-echo)
-  (setq corfu-echo-delay t)
-  (corfu-echo-mode)
-  
-  (require 'corfu-popupinfo)
-  (setq corfu-popupinfo-delay '(1.5 . 0))
-  (corfu-popupinfo-mode)
 
-  (require 'corfu-indexed))
+  ;; triggers error in in post-command-hook (corfu--post-command)
+  ;; (require 'corfu-echo)
+  ;; (setq corfu-echo-delay t)
+  ;; (corfu-echo-mode)
+  
+  ;; (require 'corfu-popupinfo)
+  ;; (setq corfu-popupinfo-delay '(1.5 . 0))
+    ;; (setq corfu-popupinfo-delay nil)
+  ;; (corfu-popupinfo-mode)
+
+  ;; (require 'corfu-indexed)
+  )
 
 ;; Enable rich annotations using the Marginalia package
 (use-package marginalia
@@ -198,7 +205,7 @@
               ("M-<left>"  . sp-backward-slurp-sexp)
               ("M-<right>"  . sp-backward-barf-sexp)
 
-              ;; ("C-M-t" . sp-transpose-sexp)
+              ("C-M-t" . sp-transpose-sexp)
               ("C-M-k" . sp-kill-sexp)
               ("C-k"   . sp-kill-hybrid-sexp)
               ("M-k"   . sp-backward-kill-sexp)
@@ -239,9 +246,9 @@
 
 ;; do not use built-in flymake because lsp-mode-ui cannot display errors in sideline
 ;; https://github.com/emacs-lsp/lsp-ui/issues/210
-(use-package flycheck
-  :config
-  (add-hook 'after-init-hook #'global-flycheck-mode))
+;; (use-package flycheck
+;;   :config
+;;   (add-hook 'after-init-hook #'global-flycheck-mode))
 
 (use-package projectile
   :diminish 'projectile-mode ;('projectile-mode . "P")
@@ -366,7 +373,7 @@
 (use-package cider
   :config
   (setq cider-show-error-buffer t ;'only-in-repl
-        cider-font-lock-dynamically nil ; use lsp semantic tokens
+        cider-font-lock-dynamically t ; use lsp semantic tokens
         cider-eldoc-display-for-symbol-at-point nil ; use lsp
         cider-prompt-for-symbol nil
         cider-use-xref nil) ; use lsp
@@ -375,7 +382,17 @@
 ;  (remove-hook 'completion-at-point-functions #'cider-complete-at-point t)
  ; (add-hook 'completion-at-point-functions #'cider-complete-at-point 0 t)
   ))       ; config rainbow-delimiters, paredit
-                                 
+
+(defun my/remove-eglot-documentation-functions ()
+      (interactive)
+      (when (and (bound-and-true-p cider-mode) (cider-connected-p))
+        (remove-hook 'eldoc-documentation-functions #'eglot-hover-eldoc-function t)
+        (remove-hook 'eldoc-documentation-functions #'eglot-signature-eldoc-function t)
+        (remove-hook 'eldoc-documentation-functions #'eglot-completion-at-point t)
+        (setq completion-at-point-functions (remove 'eglot-completion-at-point completion-at-point-functions))))
+
+;; hook ((cider-connected . my/remove-eglot-documentation-functions))
+
 (defun disable-whitespace-mode ()
   (whitespace-mode -1))
 
@@ -432,40 +449,61 @@
   (setq ruby-insert-encoding-magic-comment nil)
   (add-hook 'ruby-mode-hook #'subword-mode))
 
+;; JS
+
+(use-package js2-mode
+  :config
+  (setq-default js2-auto-indent-p t)
+  (setq-default js2-global-externs '("module" "require" "jQuery" "$" "_" "buster" "sinon" "assert" "refute" "setTimeout" "clearTimeout" "setInterval" "clearInterval" "location" "__dirname" "console" "JSON"))
+  (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
+; (use-package js-refactor)
+
+(use-package json-reformat
+  :config
+  (setq json-reformat:indent-width 2))
+
+(use-package json-mode)
+
 ;; Dockerfile
 
 (use-package dockerfile-mode)
 
-;; Use lsp-mode now - cannot navigate to clojure code
-;; (use-package eglot)
+;; Markdown
+
+(use-package markdown-mode)
 
 ;;; eglot
 
 ;; (use-package consult-eglot)
 
-;; (use-package eglot
-;;   :straight (eglot :source gnu-elpa-mirror)
-;;   :ensure t
-;;   :commands (eglot eglot-ensure)
-;;   :custom-face (eglot-highlight-symbol-face ((t (:inherit 'highlight :background "#434C5E"))))
-;;   :hook ((clojure-mode . eglot-ensure)
-;;          (clojurec-mode . eglot-ensure)
-;;          (clojurescript-mode . eglot-ensure)
-;;          (before-save . eglot-format-buffer))
-;;   :bind (:map eglot-mode-map
-;;               ("M-l M-l" . eglot-code-actions))
-;;   :config
-;;   ;; (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode t)
-;;   (setq eglot-autoshutdown t
-;;         eglot-confirm-server-initiated-edits nil
-;;         eglot-extend-to-xref t))
+(use-package eglot
+  ;; :straight (eglot :source gnu-elpa-mirror)
+  :ensure t
+  :commands (eglot eglot-ensure)
+  :custom-face (eglot-highlight-symbol-face ((t (:inherit 'highlight))))
+  :hook ((clojure-mode . eglot-ensure)
+         (clojurec-mode . eglot-ensure)
+         (clojurescript-mode . eglot-ensure)
+         (before-save . eglot-format-buffer))
+  :bind (:map eglot-mode-map
+              ("C-." . eglot-code-actions)
+              ("M-l r r" . eglot-rename)
+              ("M-l = =" . eglot-format))
+  :config
+  ;; (add-hook 'eglot-managed-mode-hook #'eldoc-box-hover-at-point-mode t)
+  (setq eglot-autoshutdown t
+        eglot-confirm-server-initiated-edits nil
+        eglot-extend-to-xref t
+        eglot-connect-timeout 60) ; clojure-lsp sometimes takes longer to start
+  )
 
-;; (use-package jarchive
-;;   :straight (jarchive :type git
-;;                       :host nil
-;;                       :repo "https://git.sr.ht/~dannyfreeman/jarchive")
-;;   :hook ((clojure-mode . jarchive-setup)
-;;          (clojurec-mode . jarchive-setup)))
+;; peek into JARs
+(use-package jarchive
+  ;; :straight (jarchive :type git
+  ;;                     :host nil
+  ;;                     :repo "https://git.sr.ht/~dannyfreeman/jarchive")
+  :hook ((clojure-mode . jarchive-setup)
+         (clojurec-mode . jarchive-setup)))
 
 ;; (use-package eldoc
 ;;   :config
@@ -486,47 +524,68 @@
 ;;   :config
 ;;   (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 
-(use-package lsp-mode
-  :init
-  (setq lsp-keymap-prefix "M-l"
-        ; disable lsp autocomplete - use cider
-        ;; works now
-        ;lsp-completion-enable nil
-        )
-  :hook ((clojure-mode . lsp)
-         (clojurec-mode . lsp)
-         (clojurescript-mode . lsp)
-         ;; (zig-mode . lsp)
-         (lsp-mode . lsp-enable-which-key-integration)
-         ;; (ruby-mode . lsp)
-         )
-  :config
-  ;; add paths to your local installation of project mgmt tools, like lein
-  ;; (setenv "PATH" (concat
-  ;;                  "/usr/local/bin" path-separator
-  ;;                  (getenv "path")))
-  ;; (dolist (m '(clojure-mode
-  ;;              clojurec-mode
-  ;;              clojurescript-mode
-  ;;              clojurex-mode))
-  ;;   (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
-  )
+;; (use-package lsp-mode
+;;   :init
+;;   (setq lsp-keymap-prefix "M-l"
+;;         ; disable lsp autocomplete - use cider
+;;         ;; works now
+;;         ;lsp-completion-enable nil
+;;         )
+;;   :hook ((clojure-mode . lsp)
+;;          (clojurec-mode . lsp)
+;;          (clojurescript-mode . lsp)
+;;          ;; (zig-mode . lsp)
+;;          (lsp-mode . lsp-enable-which-key-integration)
+;;          ;; (ruby-mode . lsp)
+;;          )
+;;   :config
+;;   ;; add paths to your local installation of project mgmt tools, like lein
+;;   ;; (setenv "PATH" (concat
+;;   ;;                  "/usr/local/bin" path-separator
+;;   ;;                  (getenv "path")))
+;;   ;; (dolist (m '(clojure-mode
+;;   ;;              clojurec-mode
+;;   ;;              clojurescript-mode
+;;   ;;              clojurex-mode))
+;;   ;;   (add-to-list 'lsp-language-id-configuration `(,m . "clojure")))
+;;   )
 
 ;; TODO customize font for "warnings" (clj: Unused public var ...)
-(use-package lsp-ui
-  :config
-  (setq lsp-lens-enable nil
-        lsp-ui-sideline-show-code-actions nil
-        lsp-ui-sideline-show-diagnostics t
-        lsp-ui-doc-enable nil
-        lsp-ui-peek-enable nil))
+;; (use-package lsp-ui
+;;   :config
+;;   (setq lsp-lens-enable nil
+;;         lsp-ui-sideline-show-code-actions nil
+;;         lsp-ui-sideline-show-diagnostics t
+;;         lsp-ui-doc-enable nil
+;;         lsp-ui-peek-enable nil))
 
 ;; (use-package lsp-treemacs)
+
+(use-package sideline
+  :hook
+  ;; (flycheck-mode . sideline-mode)
+  (flymake-mode . sideline-mode)
+  :init
+  (setq sideline-backends-right '(sideline-flymake)
+        sideline-backends-skip-current-line t  ; don't display on current line
+        sideline-order-left 'down              ; or 'up
+        sideline-order-right 'up               ; or 'down
+        sideline-format-left "%s   "           ; format for left aligment
+        sideline-format-right "   %s"          ; format for right aligment
+        sideline-priority 100                  ; overlays' priority
+        sideline-display-backend-name t        ; display the backend name
+
+        sideline-flymake-display-mode 'line))
+
+(use-package sideline-flymake)
+
+;; (use-package sideline-flycheck
+;;   :hook (flycheck-mode . sideline-flycheck-setup))
 
 ;; a few more useful configurations...
 (use-package emacs
   :init
-  ;; TAB cycle if there are only few candidates
+  ;; tab cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
 
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
