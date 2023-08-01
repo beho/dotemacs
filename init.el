@@ -76,7 +76,7 @@
   ;; take the first installed font from this list, use at size 15
   (car (remove nil (mapcar (lambda (font) (car (member font (font-family-list))))
                            '("Berkeley Mono" "Victor Mono" "Menlo"))))
-  "-12"))
+  "-15"))
 
 ;;; font
 ;; (set-face-attribute 'default nil
