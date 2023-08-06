@@ -6,6 +6,7 @@
         ("melpa-stable" . "https://stable.melpa.org/packages/")))
 
 (package-initialize)
+(setq package-install-upgrade-built-in t)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -42,6 +43,21 @@
 ;; load diminish first so that we can use it further
 ;; (use-package diminish
 ;;   :diminish 'auto-revert-mode)
+
+(use-package nerd-icons
+  :init
+  (nerd-icons-install-fonts t))
+
+(use-package doom-themes
+  :config
+  (doom-themes-visual-bell-config))
+
+(use-package doom-modeline
+  :init
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t)
+  :config
+  (doom-modeline-mode t))
 
 (use-package paren
   :config
@@ -250,13 +266,13 @@
 ;;   :config
 ;;   (add-hook 'after-init-hook #'global-flycheck-mode))
 
-(use-package projectile
-  :diminish 'projectile-mode ;('projectile-mode . "P")
-;  :diminish ('projectile-mode . "PPP")
-  :config
-  (global-set-key (kbd "C-c p") 'projectile-command-map)
-  (projectile-mode +1)
-  (setq projectile-create-missing-test-files t))
+;; (use-package projectile
+;;   :diminish 'projectile-mode ;('projectile-mode . "P")
+;; ;  :diminish ('projectile-mode . "PPP")
+;;   :config
+;;   (global-set-key (kbd "C-c p") 'projectile-command-map)
+;;   (projectile-mode +1)
+;;   (setq projectile-create-missing-test-files t))
 
 ;; treemacs
 (use-package treemacs

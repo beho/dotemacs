@@ -51,6 +51,8 @@
 ;; https://emacs.stackexchange.com/a/28746
 (setq auto-window-vscroll nil)
 
+(pixel-scroll-precision-mode)
+
 (global-display-line-numbers-mode)
 ;; (global-hl-line-mode)
 
@@ -76,7 +78,7 @@
   ;; take the first installed font from this list, use at size 15
   (car (remove nil (mapcar (lambda (font) (car (member font (font-family-list))))
                            '("Berkeley Mono" "Victor Mono" "Menlo"))))
-  "-15"))
+  "-12"))
 
 ;;; font
 ;; (set-face-attribute 'default nil
@@ -112,9 +114,6 @@
 ;; delete the selection with a keypress
 (delete-selection-mode t)
 
-;; (global-unset-key (kbd "C-w"))
-(global-set-key (kbd "C-`") 'backward-kill-word)
-
 ;; (global-prettify-symbols-mode 1)
 
 ;; load modules
@@ -130,17 +129,10 @@
 
 (load-theme 'beho-light t)
 
-(use-package doom-themes
-  :config
-  (doom-themes-visual-bell-config))
-
-(use-package doom-modeline
-  :init
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  :config
-  (doom-modeline-mode t))
-
+;; editing commands
+;; (global-unset-key (kbd "C-w"))
+(global-set-key (kbd "C-`") 'backward-kill-word)
+(global-set-key (kbd "C-M-g") 'duplicate-line)
 
 ;; navigate flymake errors
 (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
@@ -188,7 +180,7 @@
  '(custom-safe-themes
    '("a26c7fb9347b6b66fdad6cfe88fadeec395ddfb2ef13f80531c4e2f9cd083361" "f80e2e454abd167243b8bbbefa92d9e8a46813769ba0c49af8ff4582b943b8b4" "ee9f1c32046a8db565e21cd66b84e2ac6440ca3d633eea74194451ec57a8c846" "5c9bd73de767fa0d0ea71ee2f3ca6fe77261d931c3d4f7cca0734e2a3282f439" "37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" "ea0e92e8625b7681a490123b40e45a6b7d88febcc4cd456c2f9ad27a9637eb2e" default))
  '(package-selected-packages
-   '(corfu-echo markdown-mode json-reformat json-mode js2-mode zig-mode yasnippet which-key visual-regexp vertico use-package undo-fu treemacs smartparens smart-tab sideline-flymake projectile paren-face orderless move-text marginalia magit jarchive inf-ruby expand-region exec-path-from-shell eglot doom-themes doom-modeline dockerfile-mode corfu cider ag))
+   '(nerd-themes corfu-echo markdown-mode json-reformat json-mode js2-mode zig-mode yasnippet which-key visual-regexp vertico use-package undo-fu treemacs smartparens smart-tab sideline-flymake projectile paren-face orderless move-text marginalia magit jarchive inf-ruby expand-region exec-path-from-shell eglot doom-themes doom-modeline dockerfile-mode corfu cider ag))
  '(subatomic-more-visible-comment-delimiters t)
  '(warning-suppress-log-types '((comp)))
  '(warning-suppress-types 'nil))
