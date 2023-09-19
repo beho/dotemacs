@@ -66,6 +66,9 @@
 
 (when (string-match "AppKit" (version))
 
+  ;; emacs-mac has its own precision mode os turn off 29's one
+  ;; (pixel-scroll-precision-mode nil)
+
   ;; default railway has these the other way round
   (setq mac-option-modifier 'meta)
   (setq mac-command-modifier 'super)
