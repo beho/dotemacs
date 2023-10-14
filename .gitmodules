@@ -1,0 +1,6 @@
+[submodule "packages/asdf.el"]
+	path = packages/asdf.el
+	url = git@github.com:tabfugnic/asdf.el.git
+[submodule "packages/highlight-sexp"]
+	path = packages/highlight-sexp
+	url = git@github.com:daimrod/highlight-sexp.git
