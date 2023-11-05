@@ -1,9 +1,16 @@
 ;; -*- emacs-lisp -*- -*- lexical-binding: t; -*-
 
 (setq package-archives
-      '(("gnu"          . "https://elpa.gnu.org/packages/")
-        ("melpa"        . "https://melpa.org/packages/")
-        ("melpa-stable" . "https://stable.melpa.org/packages/")))
+      '(("melpa"        . "https://melpa.org/packages/")
+        ("melpa-stable" . "https://stable.melpa.org/packages/")
+        ("nongnu"       . "https://elpa.nongnu.org/nongnu/")
+        ("gnu"          . "https://elpa.gnu.org/packages/")))
+
+(setq package-archive-priorities
+      '(("melpa"        . 40)
+        ("melpa-stable" . 30)
+        ("nongnu"       . 20)
+        ("gnu"          . 10)))
 
 (package-initialize)
 (setq package-install-upgrade-built-in t)
@@ -12,31 +19,16 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(eval-and-compile
-  (if init-file-debug
-      (setq use-package-verbose t
-            use-package-expand-minimally nil
-            use-package-compute-statistics t
-            debug-on-error t)
-    (setq use-package-verbose nil
-          use-package-expand-minimally t)))
+(if init-file-debug
+    (setq use-package-verbose t
+          use-package-expand-minimally nil
+          use-package-compute-statistics t
+          debug-on-error t)
+  (setq use-package-verbose nil
+        use-package-expand-minimally t))
 
-(eval-and-compile
-  (require 'use-package))
-
-;;; setup straight
-; (defvar bootstrap-version)
-; (let ((bootstrap-file
-;        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-;       (bootstrap-version 5))
-;   (unless (file-exists-p bootstrap-file)
-;     (with-current-buffer
-;         (url-retrieve-synchronously
-;          "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-;          'silent 'inhibit-cookies)
-;       (goto-char (point-max))
-;       (eval-print-last-sexp)))
-                                        ;   (load bootstrap-file nil 'nomessage))
+(require 'use-package)
+(setq use-package-always-ensure t)
 
 ; package for syncing Emacs with shell
 (use-package exec-path-from-shell)
@@ -45,10 +37,14 @@
 (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize))
 
+;; interacts with magit via seq dependency
+(use-package magit
+  :custom ((magit-diff-refine-hunk 'all)))
+
 (use-package nerd-icons
   ;; install when not available
-  ;; :init
-  ;; (nerd-icons-install-fonts t)
+  :init
+  (nerd-icons-install-fonts t)
   )
 
 ;; (use-package doom-themes
@@ -113,8 +109,9 @@
       uniquify-ignore-buffers-re "^\\*")
 
 (use-package smart-tab)
-(use-package magit
-  :custom ((magit-diff-refine-hunk 'all)))
+
+
+
 (use-package ag)
 
 ;; undo-tree-mode aliased to command+z/shift+command+z
@@ -522,8 +519,6 @@
 ;; (use-package consult-eglot)
 
 (use-package eglot
-  ;; :straight (eglot :source gnu-elpa-mirror)
-  :ensure t
   :commands (eglot eglot-ensure)
   :custom-face (eglot-highlight-symbol-face ((t (:inherit 'highlight))))
   :hook (
