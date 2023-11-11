@@ -521,11 +521,14 @@
 (use-package eglot
   :commands (eglot eglot-ensure)
   :custom-face (eglot-highlight-symbol-face ((t (:inherit 'highlight))))
-  :hook (
+  ;; :hook (
          ;; (clojure-mode . eglot-ensure)
          ;; (clojurec-mode . eglot-ensure)
          ;; (clojurescript-mode . eglot-ensure)
-         (before-save . eglot-format-buffer))
+         ;; https://emacs.stackexchange.com/a/5777
+         ;; format on save in certain modes
+         ;; (before-save . eglot-format-buffer)
+         ;; )
   :bind (:map eglot-mode-map
               ("C-." . eglot-code-actions)
               ("M-l r r" . eglot-rename)
