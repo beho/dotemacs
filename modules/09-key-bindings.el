@@ -15,9 +15,9 @@
 (keymap-global-set "C-M-g" 'duplicate-line)
 
 ;; navigate flymake errors
-(define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
-(define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
-(define-key flymake-mode-map (kbd "C-x p -") 'flymake-show-project-diagnostics)
+;; (define-key flymake-mode-map (kbd "M-n") 'flymake-goto-next-error)
+;; (define-key flymake-mode-map (kbd "M-p") 'flymake-goto-prev-error)
+;; (define-key flymake-mode-map (kbd "C-x p -") 'flymake-show-project-diagnostics)
 
 ;; navigate windows
 (keymap-global-set "M-s-<left>"  'windmove-left)

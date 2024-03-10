@@ -43,8 +43,8 @@
 
 (use-package nerd-icons
   ;; install when not available
-  :init
-  (nerd-icons-install-fonts t)
+  ;; :init
+  ;; (nerd-icons-install-fonts t)
   )
 
 ;; (use-package doom-themes
@@ -276,16 +276,21 @@
   ;; (asdf-enable)
   )
 
-(use-package flymake)
+;; (use-package flymake)
 ;; (use-package flymake-ruby)
 
 ;; (use-package aggressive-indent)
 
 ;; do not use built-in flymake because lsp-mode-ui cannot display errors in sideline
 ;; https://github.com/emacs-lsp/lsp-ui/issues/210
-;; (use-package flycheck
-;;   :config
-;;   (add-hook 'after-init-hook #'global-flycheck-mode))
+
+(use-package flycheck
+  :init (global-flycheck-mode))
+
+(use-package flycheck-eglot
+  :after (flycheck eglot)
+  :config
+  (global-flycheck-eglot-mode 1))
 
 ;; (use-package projectile
 ;;   :diminish 'projectile-mode ;('projectile-mode . "P")
@@ -383,16 +388,6 @@
 
 ;; (use-package treemacs-icons-dired
 ;;   :hook (dired-mode . treemacs-icons-dired-enable-once))
-
-;; (use-package posframe)
-;; display flymake diagnostics at point
-;; (require 'flymake-posframe)
-;; (add-hook 'flymake-mode 'flymake-posframe-mode)
-
-;; (use-package flymake-posframe
-;;   :straight (:files (:defaults "extensions/*"))
-;;   ;; :load-path "downloaded/flymake-posframe"
-;;   :hook (flymake-mode . flymake-posframe-mode))
 
 ;; Clojure
 
@@ -540,7 +535,7 @@
   (setq eglot-autoshutdown t
         eglot-confirm-server-initiated-edits nil
         eglot-extend-to-xref t
-        eglot-connect-timeout 60) ; clojure-lsp sometimes takes longer to start
+        eglot-connect-timeout 90) ; clojure-lsp sometimes takes longer to start
   )
 
 ;; peek into JARs
@@ -554,21 +549,6 @@
 ;; (use-package eldoc
 ;;   :config
 ;;   (setq eldoc-echo-area-use-multiline-p nil))
-
-;; ;; (use-package flymake
-;; ;;    ;; :config
-;; ;;    ;; (setq eldoc-documentation-function 'eldoc-documentation-compose)
-;; ;;    ;; (add-hook 'flymake-mode-hook
-;; ;;    ;;           (lambda ()
-;; ;;    ;;             (setq eldoc-documentation-functions
-;; ;;    ;;                   (cons 'flymake-eldoc-function
-;; ;;    ;;                         (delq 'flymake-eldoc-function eldoc-documentation-functions)))))
-;; ;;    )
-
-;; (use-package flymake-diagnostic-at-point
-;;   :after flymake
-;;   :config
-;;   (add-hook 'flymake-mode-hook #'flymake-diagnostic-at-point-mode))
 
 ;; (use-package lsp-mode
 ;;   :init
@@ -609,10 +589,10 @@
 
 (use-package sideline
   :hook
-  ;; (flycheck-mode . sideline-mode)
-  (flymake-mode . sideline-mode)
+  ((flycheck-mode . sideline-mode))
+  ;; (flymake-mode . sideline-mode)
   :init
-  (setq sideline-backends-right '(sideline-flymake)
+  (setq sideline-backends-right '(sideline-flycheck)
         sideline-backends-skip-current-line t  ; don't display on current line
         sideline-order-left 'down              ; or 'up
         sideline-order-right 'up               ; or 'down
@@ -623,10 +603,14 @@
 
         sideline-flymake-display-mode 'line))
 
-(use-package sideline-flymake)
+;; (use-package sideline-flymake)
 
-;; (use-package sideline-flycheck
-;;   :hook (flycheck-mode . sideline-flycheck-setup))
+(use-package sideline-flycheck
+  :hook (flycheck-mode . sideline-flycheck-setup))
+
+(use-package org
+  :init
+  (setq org-agenda-files '("~/tmp/org/")))
 
 ;; a few more useful configurations...
 (use-package emacs
