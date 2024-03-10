@@ -7,7 +7,7 @@
  '(fringe ((t (:background "#FFFFFF"))))
  '(region ((t (:background "#bfdffc"))))
  '(font-lock-builtin-face ((t (:foreground "#222222" :weight semi-bold))))
- '(font-lock-comment-face ((t (:foreground "#666666"))))
+ '(font-lock-comment-face ((t (:foreground "#666666" :slant italic))))
  '(font-lock-function-name-face ((t (:weight bold))))
  '(font-lock-keyword-face ((t (:weight bold))))
  '(font-lock-string-face ((t (:foreground "#41663D")))) ; :slant italic
