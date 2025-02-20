@@ -9,7 +9,10 @@
 ;; (setq slime-net-coding-system 'utf-8-unix)
 
 ;; (setq shell-file-name "/usr/local/bin/fish")
-(setq shell-file-name "/bin/bash")
+;; (setq shell-file-name "/bin/bash")
+;; for some reason this was set to /bin/bash but then path set in fish
+;; was not picked up by exec-path-from-shell
+(setq shell-file-name "/usr/bin/fish")
 ;; (setenv "SHELL" "/bin/bash")
 
 (setq user-full-name "Svatopluk Šperka"
@@ -72,12 +75,14 @@
 (set-default 'indicate-empty-lines t)
 
 ;; Typography
-(set-frame-font 
- (concat
-  ;; take the first installed font from this list, use at size 15
-  (car (remove nil (mapcar (lambda (font) (car (member font (font-family-list))))
-                           '("Berkeley Mono" "Victor Mono" "Menlo"))))
-  "-12"))
+(set-frame-font
+(concat
+ ;; take the first installed font from this list, use at size 15
+ (car (remove nil (mapcar (lambda (font) (car (member font (font-family-list))))
+                          '("Berkeley Mono" "Victor Mono" "Menlo"))))
+ "-10")
+ nil
+ t)
 
 ;;; font
 ;; (set-face-attribute 'default nil
