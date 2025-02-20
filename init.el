@@ -120,14 +120,15 @@
 
 ;; (global-prettify-symbols-mode 1)
 
-(pixel-scroll-precision-mode t)
+;; (pixel-scroll-precision-mode t)
 
 ;; load modules
 (mapc #'load-file (directory-files (concat user-emacs-directory "modules") t "[0-9]*.el$"))
 
 ;; remap lang modes to tree-sitter-ones
-(setq major-mode-remap-alist
- '((ruby-mode . ruby-ts-mode)))
+;; (setq major-mode-remap-alist
+;;       '((ruby-mode . ruby-ts-mode)) ; https://github.com/tree-sitter/tree-sitter-ruby
+;;       )
 
 
 ;;; tabs
