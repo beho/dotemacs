@@ -123,11 +123,7 @@
   :config
   (global-set-key (kbd "M-g f") 'avy-goto-line))
 
-;; TODO fix extensions removing straight
-(use-package vertico
-  ; :straight (:files (:defaults "extensions/*"))
-  :init
-  (vertico-mode))
+
 
 (use-package orderless
   :init
@@ -139,46 +135,76 @@
         completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;; TODO fix extensions removing straight
-(use-package corfu
-  ; :straight (:files (:defaults "extensions/*"))
-  ;; :load-path "straight/build/corfu/extensions/"
-  ;; Optional customizations
-  :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  (corfu-separator ?\s)          ;; Orderless field separator
-  (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
+;; (use-package corfu
+;;   ; :straight (:files (:defaults "extensions/*"))
+;;   ;; :load-path "straight/build/corfu/extensions/"
+;;   ;; Optional customizations
+;;   :custom
+;;   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
+;;   (corfu-auto t)                 ;; Enable auto completion
+;;   (corfu-separator ?\s)          ;; Orderless field separator
+;;   (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
+;;   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
+;;   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
+;;   ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
+;;   ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
+;;   ;; (corfu-scroll-margin 5)        ;; Use scroll margin
 
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
+;;   ;; Enable Corfu only for certain modes.
+;;   ;; :hook ((prog-mode . corfu-mode)
+;;   ;;        (shell-mode . corfu-mode)
+;;   ;;        (eshell-mode . corfu-mode))
 
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `corfu-excluded-modes'.
-  :init
-  (global-corfu-mode)
+;;   ;; Recommended: Enable Corfu globally.
+;;   ;; This is recommended since Dabbrev can be used globally (M-/).
+;;   ;; See also `corfu-excluded-modes'.
+;;   :init
+;;   (global-corfu-mode)
 
-  ;; triggers error in in post-command-hook (corfu--post-command)
-  ;; (require 'corfu-echo)
-  ;; (setq corfu-echo-delay t)
-  ;; (corfu-echo-mode)
+;;   ;; triggers error in in post-command-hook (corfu--post-command)
+;;   ;; (require 'corfu-echo)
+;;   ;; (setq corfu-echo-delay t)
+;;   ;; (corfu-echo-mode)
   
-  ;; (require 'corfu-popupinfo)
-  ;; (setq corfu-popupinfo-delay '(1.5 . 0))
-    ;; (setq corfu-popupinfo-delay nil)
-  ;; (corfu-popupinfo-mode)
+;;   ;; (require 'corfu-popupinfo)
+;;   ;; (setq corfu-popupinfo-delay '(1.5 . 0))
+;;     ;; (setq corfu-popupinfo-delay nil)
+;;   ;; (corfu-popupinfo-mode)
 
-  ;; (require 'corfu-indexed)
+;;   ;; (require 'corfu-indexed)
+;;   )
+
+(use-package consult
+  :bind (("C-x b" . consult-buffer)
+         ("C-c ! g" . consult-flycheck)
+         ("C-x p g" . consult-ripgrep)
+         ("M-g g" . consult-goto-line)
+         ("M-g g" . consult-goto-line)
+         ("M-g i" . consult-imenu)))
+(use-package consult-flycheck)
+
+;; TODO fix extensions removing straight
+(use-package vertico
+                                        ; :straight (:files (:defaults "extensions/*"))
+  :custom
+  ;; (vertico-scroll-margin 0)
+  ;; (vertico-count 20)
+  ;; (vertico-resize t)
+  (vertico-cycle t)
+  :init
+  ;; Use `consult-completion-in-region' if Vertico is enabled.
+  ;; Otherwise use the default `completion--in-region' function.
+  (setq completion-in-region-function
+      (lambda (&rest args)
+        (apply (if vertico-mode
+                   #'consult-completion-in-region
+                 #'completion--in-region)
+               args)))
+  (vertico-mode)
+  ;; (keymap-set vertico-map "TAB" #'minibuffer-complete)
   )
 
-;; Enable rich annotations using the Marginalia package
+;; enable rich annotations using the Marginalia package
 (use-package marginalia
   ;; Either bind `marginalia-cycle' globally or only in the minibuffer
   :bind (("M-A" . marginalia-cycle)
@@ -272,7 +298,7 @@
 (use-package asdf
   :load-path "packages/asdf.el/"
   :config
-  (setq asdf-binary "/usr/local/bin/asdf")
+  (setq asdf-binary "/home/beho/.asdf/bin/asdf")
   ;; (asdf-enable)
   )
 
@@ -447,6 +473,27 @@
 
 (use-package zig-mode)
 
+;; Lua
+
+(use-package lua-mode)
+
+;; Nix
+
+(use-package nix-mode
+  :mode ("\\.nix\\'" "\\.nix.in\\'"))
+
+(use-package nix-drv-mode
+  :ensure nix-mode
+  :mode "\\.drv\\'")
+
+(use-package nix-shell
+  :ensure nix-mode
+  :commands (nix-shell-unpack nix-shell-configure nix-shell-build))
+
+(use-package nix-repl
+  :ensure nix-mode
+  :commands (nix-repl))
+
 ;; Pony
 
 ;; (use-package ponylang-mode
@@ -535,7 +582,7 @@
   (setq eglot-autoshutdown t
         eglot-confirm-server-initiated-edits nil
         eglot-extend-to-xref t
-        eglot-connect-timeout 90) ; clojure-lsp sometimes takes longer to start
+        eglot-connect-timeout 360) ; clojure-lsp sometimes takes longer to start
   )
 
 ;; peek into JARs
@@ -614,6 +661,10 @@
 
 ;; a few more useful configurations...
 (use-package emacs
+  :custom
+  (enable-recursive-minibuffers t)
+  (read-extended-command-predicate #'command-completion-default-include-p)
+
   :init
   ;; tab cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
@@ -626,3 +677,14 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
+
+;; Should be at the end to load early
+(use-package envrc
+  :hook (after-init . envrc-global-mode))
+
+(setq completion-in-region-function
+      (lambda (&rest args)
+        (apply (if vertico-mode
+                   #'consult-completion-in-region
+                 #'completion--in-region)
+               args)))

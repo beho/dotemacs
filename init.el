@@ -170,33 +170,13 @@
 (setq switch-to-buffer-obey-display-actions t)
 
 
-
-;; (custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(custom-safe-themes
-;;    '("a26c7fb9347b6b66fdad6cfe88fadeec395ddfb2ef13f80531c4e2f9cd083361" "f80e2e454abd167243b8bbbefa92d9e8a46813769ba0c49af8ff4582b943b8b4" "ee9f1c32046a8db565e21cd66b84e2ac6440ca3d633eea74194451ec57a8c846" "5c9bd73de767fa0d0ea71ee2f3ca6fe77261d931c3d4f7cca0734e2a3282f439" "37768a79b479684b0756dec7c0fc7652082910c37d8863c35b702db3f16000f8" "ea0e92e8625b7681a490123b40e45a6b7d88febcc4cd456c2f9ad27a9637eb2e" default))
-;;  '(package-selected-packages
-;;    '(mood-line mood-modeline flymake aggressive-indent aggressive-indend clojure-ts-mode eglot nerd-themes corfu-echo markdown-mode json-reformat json-mode js2-mode zig-mode yasnippet which-key visual-regexp vertico use-package undo-fu smartparens smart-tab sideline-flymake projectile paren-face orderless move-text marginalia magit jarchive inf-ruby expand-region exec-path-from-shell doom-themes doom-modeline dockerfile-mode corfu cider ag))
-;;  '(subatomic-more-visible-comment-delimiters t)
-;;  '(warning-suppress-log-types '((comp)))
-;;  '(warning-suppress-types 'nil))
-;; (custom-set-faces
-;;  ;; custom-set-faces was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(italic ((t (:slant normal)))))
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(sideline-flycheck flycheck-eglot flycheck ace-window avy zig-mode yasnippet which-key visual-regexp vertico undo-fu smartparens smart-tab sideline-flymake paren-face orderless move-text mood-line markdown-mode marginalia magit json-reformat json-mode js2-mode jarchive inf-ruby flymake-ruby expand-region exec-path-from-shell eglot doom-themes doom-modeline dockerfile-mode corfu clojure-ts-mode cider aggressive-indent ag)))
+   '(consult-flycheck consult eglot envrc nix-mode lua-mode sideline-flycheck sideline jarchive markdown-mode dockerfile-mode json-mode json-reformat inf-ruby zig-mode cider clojure-mode flycheck-eglot flycheck yasnippet ace-window expand-region smartparens move-text which-key marginalia corfu orderless vertico avy visual-regexp undo-fu ag smart-tab paren-face doom-modeline nerd-icons magit exec-path-from-shell)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
